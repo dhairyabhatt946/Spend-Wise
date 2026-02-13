@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar(250)
+  code       String     @unique @db.VarChar(20)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  categories Category[]
+  expenses   Expense[]
+  incomes    Income[]
+  projects   Project[]
+  users      User[]
+
+  @@map("organizations")
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String       @db.VarChar(250)
+  email        String       @unique @db.VarChar(250)
+  password     String       @db.VarChar(250)
+  mobile       String?      @db.VarChar(50)
+  profileImage String?      @map("profile_image") @db.VarChar(500)
+  orgId        Int          @map("org_id")
+  role         UserRole     @default(EMPLOYEE)
+  status       UserStatus   @default(PENDING)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  expenses     Expense[]
+  incomes      Income[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("users")
+}
+
+model Project {
+  id           Int          @id @default(autoincrement())
+  name         String       @db.VarChar(250)
+  description  String?      @db.VarChar(500)
+  startDate    DateTime?    @map("start_date")
+  endDate      DateTime?    @map("end_date")
+  isActive     Boolean      @default(true) @map("is_active")
+  orgId        Int          @map("org_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  expenses     Expense[]
+  incomes      Income[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("projects")
+}
+
+model Category {
+  id            Int           @id @default(autoincrement())
+  name          String        @db.VarChar(250)
+  isExpense     Boolean       @default(true) @map("is_expense")
+  isIncome      Boolean       @default(false) @map("is_income")
+  orgId         Int           @map("org_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  organization  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  expenses      Expense[]
+  incomes       Income[]
+  subCategories SubCategory[]
+
+  @@map("categories")
+}
+
+model SubCategory {
+  id         Int       @id @default(autoincrement())
+  name       String    @map("name") @db.VarChar(250)
+  categoryId Int       @map("category_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  expenses   Expense[]
+  incomes    Income[]
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("sub_categories")
+}
+
+model Expense {
+  id             Int          @id @default(autoincrement())
+  amount         Decimal      @db.Decimal(10, 2)
+  date           DateTime
+  description    String?      @db.VarChar(500)
+  attachmentPath String?      @map("attachment_path") @db.VarChar(500)
+  userId         Int          @map("user_id")
+  orgId          Int          @map("org_id")
+  projectId      Int?         @map("project_id")
+  categoryId     Int?         @map("category_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  subCategoryId  Int?         @map("sub_category_id")
+  category       Category?    @relation(fields: [categoryId], references: [id])
+  organization   Organization @relation(fields: [orgId], references: [id])
+  project        Project?     @relation(fields: [projectId], references: [id])
+  subCategory    SubCategory? @relation(fields: [subCategoryId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@map("expenses")
+}
+
+model Income {
+  id            Int          @id @default(autoincrement())
+  amount        Decimal      @db.Decimal(10, 2)
+  date          DateTime
+  description   String?      @db.VarChar(500)
+  userId        Int          @map("user_id")
+  orgId         Int          @map("org_id")
+  projectId     Int?         @map("project_id")
+  categoryId    Int?         @map("category_id")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  subCategoryId Int?         @map("sub_category_id")
+  category      Category?    @relation(fields: [categoryId], references: [id])
+  organization  Organization @relation(fields: [orgId], references: [id])
+  project       Project?     @relation(fields: [projectId], references: [id])
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@map("incomes")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  EMPLOYEE
+
+  @@map("user_role")
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+
+  @@map("user_status")
+}
