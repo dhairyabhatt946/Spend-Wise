@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { redirect } from "next/navigation"
+import { logoutAction } from "@/app/actions"
 import {
     LayoutDashboard,
     Receipt,
@@ -34,13 +34,6 @@ interface SidebarProps {
 export default function Sidebar({ session }: SidebarProps) {
     const pathname = usePathname()
     const userRole = session.role
-
-    const handleLogout = async () => {
-        const response = await fetch('/api/logout', { method: 'POST' })
-        if (response.ok) {
-            window.location.href = '/login'
-        }
-    }
 
     return (
         <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex md:flex-col shadow-sm">
@@ -90,13 +83,17 @@ export default function Sidebar({ session }: SidebarProps) {
                             {userRole}
                         </p>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        title="Logout"
-                    >
-                        <LogOut className="h-5 w-5" />
-                    </button>
+                    
+                    <form action={logoutAction}>
+                        <button
+                            type="submit"
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                            title="Logout"
+                        >
+                            <LogOut className="h-5 w-5" />
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </aside>

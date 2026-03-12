@@ -1,8 +1,8 @@
-import { prisma } from '@/app/lib/prisma'
+import { prisma } from '@/app/lib/prisma' 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Check, X, Shield, User as UserIcon, BadgeCheck } from 'lucide-react'
-import { approveUserAction, rejectUserAction } from './actions'
+import { approveUserAction, rejectUserAction, deleteUserAction, addUserDirectlyAction } from './actions'
+import { Check, X, Shield, BadgeCheck, Trash2, UserPlus } from 'lucide-react'
 
 async function getSession() {
     const cookieHeader = (await headers()).get("cookie") || ""
@@ -19,8 +19,10 @@ export default async function TeamPage() {
         return <div className="p-8 text-center text-red-500">Access Denied. Contact your Admin.</div>
     }
 
+    const orgId = Number(session.orgId)
+
     const users = await prisma.user.findMany({
-        where: { orgId: Number(session.orgId) },
+        where: { orgId: orgId },
         orderBy: { createdAt: 'desc' }
     })
 
@@ -30,6 +32,7 @@ export default async function TeamPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-8">
 
+            {/* Header */}
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Team Management</h1>
@@ -40,6 +43,58 @@ export default async function TeamPage() {
                 </div>
             </div>
 
+            {/* DIRECTLY ADD MEMBER FORM */}
+            {/* DIRECTLY ADD MEMBER FORM */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-indigo-600" />
+                    <h3 className="font-bold text-gray-900">Directly Add Member</h3>
+                </div>
+                <div className="p-6">
+                    <form action={async (formData) => {
+                        "use server"
+                        await addUserDirectlyAction(orgId, formData)
+                    }}>
+                        {/* Switched to a Grid layout so the 4 fields fit nicely */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                            <div className="w-full">
+                                <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                                <input name="name" type="text" required placeholder="e.g. Jane Doe" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                            </div>
+
+                            <div className="w-full">
+                                <label className="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input name="email" type="email" required placeholder="jane@company.com" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                            </div>
+
+                            {/* NEW: Password Field */}
+                            <div className="w-full">
+                                <label className="block text-sm font-medium text-gray-700">Password</label>
+                                <input name="password" type="password" required placeholder="••••••••" minLength={6} className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                            </div>
+
+                            <div className="w-full">
+                                <label className="block text-sm font-medium text-gray-700">Role</label>
+                                <select name="role" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="EMPLOYEE">Employee</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                            <button type="submit" className="bg-indigo-600 text-white rounded-md px-6 py-2 text-sm font-medium hover:bg-indigo-700 transition-colors">
+                                Add User
+                            </button>
+                        </div>
+                    </form>
+                    <p className="mt-4 text-xs text-gray-500 border-t border-gray-100 pt-3">
+                        * Users added here are instantly activated and can log in using the email and password you set above.
+                    </p>
+                </div>
+            </div>
+
+            {/* PENDING APPROVALS */}
             {pendingUsers.length > 0 && (
                 <div className="bg-white rounded-xl shadow-sm border border-amber-200 overflow-hidden">
                     <div className="bg-amber-50 px-6 py-4 border-b border-amber-100 flex items-center gap-2">
@@ -61,17 +116,16 @@ export default async function TeamPage() {
                                         </span>
                                     </div>
                                 </div>
-
                                 <div className="flex gap-3">
                                     <form action={rejectUserAction}>
                                         <input type="hidden" name="userId" value={user.id} />
-                                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors">
+                                        <button type="submit" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors">
                                             <X className="w-4 h-4" /> Reject
                                         </button>
                                     </form>
                                     <form action={approveUserAction}>
                                         <input type="hidden" name="userId" value={user.id} />
-                                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors shadow-sm">
+                                        <button type="submit" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors shadow-sm">
                                             <Check className="w-4 h-4" /> Approve
                                         </button>
                                     </form>
@@ -82,6 +136,7 @@ export default async function TeamPage() {
                 </div>
             )}
 
+            {/* ACTIVE MEMBERS */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100">
                     <h3 className="font-bold text-gray-900">Active Members</h3>
@@ -93,6 +148,7 @@ export default async function TeamPage() {
                             <th className="px-6 py-4">Role</th>
                             <th className="px-6 py-4">Status</th>
                             <th className="px-6 py-4">Joined</th>
+                            <th className="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -108,9 +164,10 @@ export default async function TeamPage() {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'OWNER' ? 'bg-purple-100 text-purple-800' :
-                                            user.role === 'ADMIN' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                                        }`}>
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                        user.role === 'OWNER' ? 'bg-purple-100 text-purple-800' :
+                                        user.role === 'ADMIN' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                                    }`}>
                                         {user.role}
                                     </span>
                                 </td>
@@ -125,6 +182,24 @@ export default async function TeamPage() {
                                 </td>
                                 <td className="px-6 py-4 text-gray-500">
                                     {new Date(user.createdAt).toLocaleDateString()}
+                                </td>
+                                
+                                <td className="px-6 py-4 text-right">
+                                    {user.role !== 'OWNER' && (
+                                        <form action={async (formData) => {
+    "use server"
+    await deleteUserAction(formData)
+}}>
+    <input type="hidden" name="userId" value={user.id} />
+    <button 
+        type="submit" 
+        title="Delete User"
+        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+    >
+        <Trash2 className="w-4 h-4" />
+    </button>
+</form>
+                                    )}
                                 </td>
                             </tr>
                         ))}
