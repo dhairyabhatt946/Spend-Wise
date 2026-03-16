@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createExpenseAction, deleteExpenseAction } from './actions'
 import { Plus, Sparkles, Receipt, X, Trash2 } from 'lucide-react'
+import ExpenseFormClient from './ExpenseFormClient'
 
 async function getSession() {
   const cookieHeader = (await headers()).get("cookie") || ""
@@ -69,76 +70,12 @@ export default async function ExpensesPage({
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 relative">
-          <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h3 className="font-bold text-gray-900 flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-indigo-600" /> New Expense Record
-            </h3>
-            <Link href="/dashboard/expenses" className="text-gray-400 hover:text-gray-600">
-              <X className="w-5 h-5" />
-            </Link>
-          </div>
-          
-          <div className="p-6 grid md:grid-cols-2 gap-8">
-            <div className="border-2 border-dashed border-indigo-200 rounded-xl p-8 flex flex-col items-center justify-center text-center bg-indigo-50/50 hover:bg-indigo-50 transition-colors">
-              <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-indigo-600">
-                <Sparkles className="w-8 h-8" />
-              </div>
-              <h4 className="font-bold text-gray-900 mb-2">Smart Receipt Scanner</h4>
-              <p className="text-sm text-gray-500 mb-6 max-w-xs">
-                Upload a photo of your bill. Our AI will automatically extract the date, amount, and details.
-              </p>
-              <button type="button" className="bg-white border border-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-medium text-sm shadow-sm hover:border-indigo-300 transition-all flex items-center gap-2">
-                Upload Image <span className="text-xs bg-indigo-100 px-2 py-0.5 rounded-full">Coming Next</span>
-              </button>
-            </div>
-
-            <form action={async (formData) => {
-              "use server"
-              await createExpenseAction(userId, orgId, formData)
-            }} className="space-y-4">
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Amount (₹)</label>
-                  <input name="amount" type="number" step="0.01" required className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500" placeholder="0.00" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date</label>
-                  <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Category</label>
-                  <select name="categoryId" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500">
-                    <option value="">-- Select --</option>
-                    {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Project</label>
-                  <select name="projectId" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500">
-                    <option value="">-- Optional --</option>
-                    {projects.map(proj => <option key={proj.id} value={proj.id}>{proj.name}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description / Merchant</label>
-                <input name="description" type="text" placeholder="e.g. Uber ride to airport" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500" />
-              </div>
-
-              <div className="pt-2 flex gap-3">
-                <button type="submit" className="flex-1 bg-gray-900 text-white rounded-md py-2.5 text-sm font-medium hover:bg-gray-800 transition-colors">
-                  Save Expense
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ExpenseFormClient 
+          userId={userId} 
+          orgId={orgId} 
+          categories={categories} 
+          projects={projects} 
+        />
       )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

@@ -1,8 +1,8 @@
 import { prisma } from '@/app/lib/prisma'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createCategoryAction, createProjectAction } from './actions'
-import { FolderKanban, Tags, Plus } from 'lucide-react'
+import { createCategoryAction, createProjectAction, toggleProjectStatusAction } from './actions'
+import { FolderKanban, Tags, Plus, Archive, ArchiveRestore } from 'lucide-react'
 import Link from 'next/link'
 
 async function getSession() {
@@ -67,9 +67,9 @@ export default async function MastersPage({
               <Plus className="w-5 h-5 text-indigo-600" /> Add Category
             </h3>
             <form action={async (formData) => {
-  "use server"
-  await createCategoryAction(orgId, formData)
-}} className="space-y-4">
+              "use server"
+              await createCategoryAction(orgId, formData)
+            }} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Category Name</label>
                 <input name="name" type="text" required placeholder="e.g. Travel, Software" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" />
@@ -122,9 +122,9 @@ export default async function MastersPage({
               <Plus className="w-5 h-5 text-indigo-600" /> Add Project
             </h3>
             <form action={async (formData) => {
-  "use server"
-  await createProjectAction(orgId, formData)
-}} className="space-y-4">
+              "use server"
+              await createProjectAction(orgId, formData)
+            }} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Project Name</label>
                 <input name="name" type="text" required placeholder="e.g. Website Redesign" className="text-black mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" />
@@ -145,21 +145,44 @@ export default async function MastersPage({
                 <tr>
                   <th className="px-6 py-4">Project Name</th>
                   <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {projects.length === 0 ? (
-                  <tr><td colSpan={2} className="px-6 py-8 text-center text-gray-500">No projects added yet.</td></tr>
+                  <tr><td colSpan={3} className="px-6 py-8 text-center text-gray-500">No projects added yet.</td></tr>
                 ) : projects.map((proj) => (
-                  <tr key={proj.id} className="hover:bg-gray-50">
+                  <tr key={proj.id} className={`hover:bg-gray-50 ${!proj.isActive ? 'opacity-50' : ''}`}>
                     <td className="px-6 py-4">
                       <p className="font-medium text-gray-900">{proj.name}</p>
                       <p className="text-xs text-gray-500 mt-1">{proj.description}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Active
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        proj.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {proj.isActive ? 'Active' : 'Archived'}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <form action={async (formData) => {
+                        "use server"
+                        await toggleProjectStatusAction(formData)
+                      }}>
+                        <input type="hidden" name="projectId" value={proj.id} />
+                        <input type="hidden" name="currentStatus" value={proj.isActive.toString()} />
+                        <button 
+                          type="submit" 
+                          title={proj.isActive ? "Archive Project" : "Restore Project"}
+                          className={`p-2 rounded-lg transition-colors ${
+                            proj.isActive 
+                              ? 'text-amber-600 hover:bg-amber-50' 
+                              : 'text-green-600 hover:bg-green-50'
+                          }`}
+                        >
+                          {proj.isActive ? <Archive className="w-4 h-4" /> : <ArchiveRestore className="w-4 h-4" />}
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 ))}

@@ -45,3 +45,24 @@ export async function createProjectAction(orgId: number, formData: FormData) {
     return { error: "Failed to create project" }
   }
 }
+
+export async function toggleProjectStatusAction(formData: FormData) {
+  try {
+    const projectId = Number(formData.get('projectId'))
+    const currentStatus = formData.get('currentStatus') === 'true'
+
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { isActive: !currentStatus }
+    })
+
+    revalidatePath('/dashboard/admin/masters')
+    revalidatePath('/dashboard/expenses')
+    revalidatePath('/dashboard/incomes')
+
+    return { success: true }
+  } catch (error) {
+    console.error("Toggle Project Error:", error)
+    return { error: "Failed to update project status" }
+  }
+}
