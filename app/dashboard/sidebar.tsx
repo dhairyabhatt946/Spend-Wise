@@ -18,7 +18,7 @@ const sidebarItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["OWNER", "ADMIN", "EMPLOYEE"] },
     { name: "Expenses", href: "/dashboard/expenses", icon: Receipt, roles: ["OWNER", "ADMIN", "EMPLOYEE"] },
     { name: "Incomes", href: "/dashboard/incomes", icon: Wallet, roles: ["OWNER", "ADMIN", "EMPLOYEE"] },
-    { name: "Reports", href: "/dashboard/reports", icon: BarChart3, roles: ["OWNER", "ADMIN"] },
+    // { name: "Reports", href: "/dashboard/reports", icon: BarChart3, roles: ["OWNER", "ADMIN"] },
     { name: "Team Requests", href: "/dashboard/admin/team", icon: Users, roles: ["OWNER", "ADMIN"] },
     { name: "Masters", href: "/dashboard/admin/masters", icon: Building2, roles: ["OWNER", "ADMIN"] },
 ]
