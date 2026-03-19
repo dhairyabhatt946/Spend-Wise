@@ -73,7 +73,7 @@ export default function RegisterPage() {
                 </div>
                 <input
                   name="email"
-                  type="email"
+                  type="text"
                   placeholder="admin@company.com"
                   required
                   className="block w-full pl-10 pr-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400"
@@ -90,7 +90,7 @@ export default function RegisterPage() {
                 </div>
                 <input
                   name="mobile"
-                  type="tel"
+                  type="text"
                   placeholder="9876543210"
                   required
                   pattern="[6-9]\d{9}"
