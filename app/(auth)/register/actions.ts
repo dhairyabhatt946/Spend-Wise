@@ -73,8 +73,12 @@ export async function registerOrgAction(prevState: any, formData: FormData) {
         }
       });
     });
-  } catch (error) {
-    return { error: "Something went wrong. Please try again." };
+  } catch (error: any) {
+    // 1. Blast the exact error to the Vercel Logs
+    console.error("🚨 REAL REGISTRATION ERROR:", error);
+    
+    // 2. Blast the exact error directly to your screen!
+    return { error: "SYSTEM ERROR: " + (error.message || String(error)) }
   }
 
   redirect('/login?registered=true');
