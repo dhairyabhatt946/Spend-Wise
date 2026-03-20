@@ -108,7 +108,7 @@ export default function LoginPage() {
                       <Building className="h-6 w-6 text-indigo-600 group-hover:text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">Create New Organization</h4>
+                      <h4 className="font-semibold text-white">Create New Organization</h4>
                       <p className="text-sm text-gray-500">I am an Owner setting up a new company.</p>
                     </div>
                   </Link>
@@ -121,7 +121,7 @@ export default function LoginPage() {
                       <Users className="h-6 w-6 text-green-600 group-hover:text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">Join Existing Team</h4>
+                      <h4 className="font-semibold text-white">Join Existing Team</h4>
                       <p className="text-sm text-gray-500">I have an Org Code and want to join.</p>
                     </div>
                   </Link>
