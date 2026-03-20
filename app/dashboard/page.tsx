@@ -1,7 +1,7 @@
 import { prisma } from '@/app/lib/prisma'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { TrendingUp, TrendingDown, Wallet, ArrowRight } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, ArrowRight, Building2 } from 'lucide-react'
 import Link from 'next/link'
 
 async function getSession() {
@@ -19,27 +19,21 @@ export default async function DashboardPage() {
   const userId = Number(session.id)
   const role = session.role
 
-  // Define the where clause based on role
   const whereClause = role === 'EMPLOYEE' ? { userId } : { orgId }
 
-  // 1. Aggregate Total Expenses
-  const expenseAgg = await prisma.expense.aggregate({
-    _sum: { amount: true },
-    where: whereClause
+  // NEW: Fetch the organization details to get the code!
+  const organization = await prisma.organization.findUnique({
+    where: { id: orgId }
   })
+
+  const expenseAgg = await prisma.expense.aggregate({ _sum: { amount: true }, where: whereClause })
   const totalExpense = Number(expenseAgg._sum.amount || 0)
 
-  // 2. Aggregate Total Incomes
-  const incomeAgg = await prisma.income.aggregate({
-    _sum: { amount: true },
-    where: whereClause
-  })
+  const incomeAgg = await prisma.income.aggregate({ _sum: { amount: true }, where: whereClause })
   const totalIncome = Number(incomeAgg._sum.amount || 0)
 
-  // 3. Calculate Balance
   const netBalance = totalIncome - totalExpense
 
-  // 4. Fetch the 5 most recent transactions (Expenses) just to show some activity
   const recentExpenses = await prisma.expense.findMany({
     where: whereClause,
     orderBy: { date: 'desc' },
@@ -54,16 +48,27 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {session.name.split(' ')[0]} 👋</h1>
-        <p className="text-gray-500">Here is what is happening with your finances today.</p>
+      {/* HEADER SECTION WITH ORG CODE */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back, {session.name.split(' ')[0]} 👋</h1>
+          <p className="text-gray-500">Here is what is happening with your finances today.</p>
+        </div>
+        
+        {/* THE ORG CODE BADGE */}
+        <div className="bg-white px-5 py-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
+          <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+            <Building2 className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Organization Code</p>
+            <p className="font-mono font-bold text-gray-900">{organization?.code}</p>
+          </div>
+        </div>
       </div>
 
       {/* SUMMARY CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* Balance Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
             <Wallet className="w-6 h-6" />
@@ -75,8 +80,6 @@ export default async function DashboardPage() {
             </h3>
           </div>
         </div>
-
-        {/* Income Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600">
             <TrendingUp className="w-6 h-6" />
@@ -86,8 +89,6 @@ export default async function DashboardPage() {
             <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(totalIncome)}</h3>
           </div>
         </div>
-
-        {/* Expense Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600">
             <TrendingDown className="w-6 h-6" />
@@ -97,7 +98,6 @@ export default async function DashboardPage() {
             <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(totalExpense)}</h3>
           </div>
         </div>
-
       </div>
 
       {/* RECENT ACTIVITY SECTION */}

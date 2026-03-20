@@ -1,105 +1,107 @@
-import Image from "next/image";
-import { prisma } from "./lib/prisma";
-import Link from "next/link"
-import { ArrowRight, CheckCircle2, ScanLine, PieChart, ShieldCheck } from "lucide-react"
+import Link from "next/link";
+import { ArrowRight, Wallet, Users, BarChart3, Receipt, ShieldCheck, Zap } from "lucide-react";
 
-export default async function Home() {
+export default function Home() {
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-slate-50 selection:bg-indigo-100 selection:text-indigo-900">
       
-      <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
-            <PieChart className="h-6 w-6" />
-            <span>SpendWise</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Sign In
-            </Link>
-            <Link href="/register" className="text-sm font-medium bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-              Get Started
-            </Link>
+      {/* NAVBAR */}
+      <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <Wallet className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold text-xl text-gray-900 tracking-tight">SpendWise</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+                Sign in
+              </Link>
+              <Link href="/register" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
-      <section className="relative overflow-hidden pt-16 pb-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
-            Smart Expense Tracking for <br />
-            <span className="text-indigo-600">Modern Teams</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            Stop chasing receipts. Use AI to scan bills, automate approvals, 
-            and get real-time financial insights for your organization.
-          </p>
-          
-          <div className="flex justify-center gap-4">
-            <Link href="/register" className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-all hover:scale-105 shadow-xl shadow-indigo-200">
-              Create Organization <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link href="/join" className="flex items-center gap-2 bg-white text-gray-700 border border-gray-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all hover:border-gray-300">
-              Join Existing Team
-            </Link>
-          </div>
-
-          <div className="mt-20 relative mx-auto max-w-5xl">
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10"></div>
-            <div className="bg-gray-900 rounded-2xl shadow-2xl p-4 ring-1 ring-gray-900/10">
-               <div className="bg-gray-800 rounded-xl aspect-[16/9] flex items-center justify-center border border-gray-700">
-                  <p className="text-gray-500 font-mono">Dashboard Preview UI</p>
-               </div>
-            </div>
-          </div>
+      {/* HERO SECTION */}
+      <main className="pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 px-4 mx-auto max-w-7xl text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-medium mb-8">
+          <Zap className="w-4 h-4" />
+          <span>The smart way to manage team finances</span>
         </div>
-      </section>
+        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-8">
+          Control your expenses. <br className="hidden md:block" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+            Empower your team.
+          </span>
+        </h1>
+        <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
+          SpendWise is the modern financial dashboard for growing organizations. Track incomes, approve expenses, and get real-time insights—all in one place.
+        </p>
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 flex items-center justify-center gap-2 text-lg">
+            Start for free <ArrowRight className="w-5 h-5" />
+          </Link>
+          <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 border border-gray-200 rounded-xl font-semibold hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-lg">
+            Company Login
+          </Link>
+        </div>
+      </main>
 
-      <section className="py-24 bg-gray-50">
+      {/* FEATURES GRID */}
+      <section className="bg-white py-24 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900">Everything you need to control spend</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Everything you need to scale</h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">Stop using messy spreadsheets. We built SpendWise with enterprise-grade features designed for simplicity.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 mb-6">
-                <ScanLine className="w-6 h-6" />
+            {/* Feature 1 */}
+            <div className="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                <Receipt className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">AI Receipt Scanning</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Don't type manually. Upload a photo of your bill and our AI automatically extracts date, amount, and merchant.
-              </p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Smart Expense Tracking</h3>
+              <p className="text-gray-600 leading-relaxed">Employees can easily log expenses with sub-categories, attach receipts, and assign them to active company projects.</p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600 mb-6">
-                <CheckCircle2 className="w-6 h-6" />
+            {/* Feature 2 */}
+            <div className="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-6">
+                <Users className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">One-Click Approvals</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Admins can approve or reject expenses instantly. Keep your team moving without the paperwork bottlenecks.
-              </p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Role-Based Access</h3>
+              <p className="text-gray-600 leading-relaxed">Invite your team with secret Organization Codes. Admins get full control, while employees only see their own data.</p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-6">
-                <ShieldCheck className="w-6 h-6" />
+            {/* Feature 3 */}
+            <div className="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6">
+                <BarChart3 className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Enterprise Grade</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Role-based access control (RBAC), secure data encryption, and audit logs. Built for scale.
-              </p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Real-time Analytics</h3>
+              <p className="text-gray-600 leading-relaxed">Instantly know your net balance. Live dashboards calculate total incomes and expenses the second they are logged.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="bg-white py-12 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-500">
-          <p>&copy; 2026 SpendWise Inc. Final Year Project.</p>
+      {/* FOOTER */}
+      <footer className="bg-white border-t border-gray-200 py-12">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4 text-gray-900">
+            <Wallet className="w-6 h-6 text-indigo-600" />
+            <span className="font-bold text-xl">SpendWise</span>
+          </div>
+          <p className="text-gray-500 text-sm">© {new Date().getFullYear()} SpendWise. All rights reserved.</p>
         </div>
       </footer>
+
     </div>
-  )
+  );
 }
